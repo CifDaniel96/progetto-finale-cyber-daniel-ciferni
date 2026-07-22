@@ -16,7 +16,7 @@ Route::get('/articles/index', [ArticleController::class, 'index'])->name('articl
 Route::get('/articles/show/{article:slug}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/articles/category/{category}', [ArticleController::class, 'byCategory'])->name('articles.byCategory');
 Route::get('/articles/user/{user}', [ArticleController::class, 'byUser'])->name('articles.byUser');
-Route::get('/articles/search', [ArticleController::class, 'articleSearch'])->name('articles.search');
+Route::get('/articles/search', [ArticleController::class, 'articleSearch'])->middleware('throttle:article-search')->name('articles.search');
 
 // Writer routes
 Route::middleware('writer')->group(function(){
