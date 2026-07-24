@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 
+
 class ArticleController extends Controller implements HasMiddleware
 {
     public static function middleware()
@@ -75,6 +76,13 @@ class ArticleController extends Controller implements HasMiddleware
             ]);
             $article->tags()->attach($newTag);
         }
+
+        Log::info('article.created', [
+            'actor_id' => Auth::id(),
+            'article_id' => $article->id,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         return redirect(route('homepage'))->with('message', 'Articolo creato con successo');
     }
@@ -143,6 +151,13 @@ class ArticleController extends Controller implements HasMiddleware
         }
         $article->tags()->sync($newTags);
 
+        Log::info('article.updated', [
+            'actor_id' => Auth::id(),
+            'article_id' => $article->id,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
         return redirect(route('writer.dashboard'))->with('message', 'Articolo modificato con successo');
     }
 
@@ -151,12 +166,24 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function destroy(Article $article)
     {
+        $articleId = $article->id;
+
         foreach ($article->tags as $tag) {
             $article->tags()->detach($tag);
         }
+
         $article->delete();
-        
-        return redirect()->back()->with('message', 'Articolo cancellato con successo');
+
+        Log::info('article.deleted', [
+            'actor_id' => Auth::id(),
+            'article_id' => $articleId,
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('message', 'Articolo cancellato con successo');
     }
 
     public function byCategory(Category $category){
