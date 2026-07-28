@@ -13,10 +13,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Services\HtmlSanitizer;
 
 
 class ArticleController extends Controller implements HasMiddleware
 {
+
+    public function __construct(
+        private HtmlSanitizer $htmlSanitizer
+    ) {
+    }
+
     public static function middleware()
     {
         return [
@@ -54,16 +61,18 @@ class ArticleController extends Controller implements HasMiddleware
             'tags' => 'required'
         ]);
 
+        $cleanBody = $this->htmlSanitizer->clean($request->body);
+
         $article = Article::create([
             'title' => $request->title,
             'subtitle' => $request->subtitle,
-            'body' => $request->body,
+            'body' => $cleanBody,
             'image' => $request->file('image')->store('public/images'),
             'category_id' => $request->category,
             'user_id' => Auth::user()->id,
             'slug' => Str::slug($request->title),
         ]);
-        
+
         $tags = explode(',', $request->tags);
 
         foreach($tags as $i => $tag){
@@ -92,9 +101,13 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function show(Article $article)
     {
-        return view('articles.show', compact('article'));
-    }
+        $sanitizedBody = $this->htmlSanitizer->clean($article->body);
 
+        return view(
+            'articles.show',
+            compact('article', 'sanitizedBody')
+        );
+    }
     /**
      * Show the form for editing the specified resource.
      */
@@ -120,10 +133,12 @@ class ArticleController extends Controller implements HasMiddleware
             'tags' => 'required'
         ]);
 
+        $cleanBody = $this->htmlSanitizer->clean($request->body);
+
         $article->update([
             'title' => $request->title,
             'subtitle' => $request->subtitle,
-            'body' => $request->body,
+            'body' => $cleanBody,
             'category_id' => $request->category,
             'slug' => Str::slug($request->title),
         ]);
@@ -134,7 +149,7 @@ class ArticleController extends Controller implements HasMiddleware
                 'image' => $request->file('image')->store('public/images')
             ]);
         }
-        
+
         $tags = explode(',', $request->tags);
 
         foreach($tags as $i => $tag){
@@ -190,7 +205,7 @@ class ArticleController extends Controller implements HasMiddleware
         $articles = $category->articles()->where('is_accepted', true)->orderBy('created_at', 'desc')->get();
         return view('articles.by-category', compact('category', 'articles'));
     }
-    
+
     public function byUser(User $user){
         $articles = $user->articles()->where('is_accepted', true)->orderBy('created_at', 'desc')->get();
         return view('articles.by-user', compact('user', 'articles'));

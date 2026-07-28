@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <hr>
-                <p>{!!$article->body!!}</p>
+                <div>{!! $sanitizedBody !!}</div>
                 @if (Auth::user() && Auth::user()->is_revisor && !$article->is_accepted)
                     <div class="container my-5">
                         <div class="row">
