@@ -6,6 +6,7 @@ use App\Http\Controllers\PublicController;
 use App\Http\Controllers\WriterController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\RevisorController;
+use App\Http\Controllers\ProfileController;
 
 // Public routes
 Route::get('/', [PublicController::class, 'homepage'])->name('homepage');
@@ -17,6 +18,14 @@ Route::get('/articles/show/{article:slug}', [ArticleController::class, 'show'])-
 Route::get('/articles/category/{category}', [ArticleController::class, 'byCategory'])->name('articles.byCategory');
 Route::get('/articles/user/{user}', [ArticleController::class, 'byUser'])->name('articles.byUser');
 Route::get('/articles/search', [ArticleController::class, 'articleSearch'])->middleware('throttle:article-search')->name('articles.search');
+
+// Authenticated user routes
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+});
 
 // Writer routes
 Route::middleware('writer')->group(function(){
