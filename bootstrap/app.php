@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // $middleware->append(RateLimit::class);
+        $middleware->append(FrameGuard::class);
         $middleware->alias([
             'admin' => App\Http\Middleware\UserIsAdmin::class,
             'revisor' => App\Http\Middleware\UserIsRevisor::class,
