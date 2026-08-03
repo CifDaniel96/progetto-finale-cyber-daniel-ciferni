@@ -33,9 +33,9 @@ class PublicController extends Controller implements HasMiddleware
     public function careersSubmit(Request $request)
     {
         $request->validate([
-            'role' => 'required',
+            'role' => 'required|in:admin,revisor,writer',
             'email' => 'required|email',
-            'message' => 'required'
+            'message' => 'required|string|max:2000',
         ]);
 
         $user = Auth::user();
