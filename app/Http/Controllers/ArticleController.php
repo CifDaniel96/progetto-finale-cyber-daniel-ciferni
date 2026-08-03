@@ -113,9 +113,8 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function edit(Article $article)
     {
-        if(Auth::user()->id != $article->user_id){
-            return redirect()->route('homepage')->with('alert', 'Accesso non consentito');
-        }
+        $this->authorize('update', $article);
+
         return view('articles.edit', compact('article'));
     }
 
@@ -124,6 +123,8 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Article $article)
     {
+        $this->authorize('update', $article);
+
         $request->validate([
             'title' => 'required|min:5|unique:articles,title,' . $article->id,
             'subtitle' => 'required|min:5',
@@ -181,6 +182,8 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function destroy(Article $article)
     {
+        $this->authorize('delete', $article);
+
         $articleId = $article->id;
 
         foreach ($article->tags as $tag) {
