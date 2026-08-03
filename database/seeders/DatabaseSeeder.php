@@ -17,62 +17,68 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // Crea un utente senza ruolo
-        User::create([
+        $this->createUserWithRoles([
             'name' => 'Steven Manson (User)',
             'email' => 'user@aulab.it',
             'password' => Hash::make('password'),
-            'is_writer' => false,
-            'is_revisor' => false,
-            'is_admin' => false,
         ]);
 
         // Crea un utente con ruolo writer
-        User::create([
-            'name' => "Daria Richardson (Writer)",
+        $this->createUserWithRoles([
+            'name' => 'Daria Richardson (Writer)',
             'email' => 'writer@aulab.it',
             'password' => Hash::make('password'),
+        ], [
             'is_writer' => true,
-            'is_revisor' => false,
-            'is_admin' => false,
         ]);
 
         // Crea un utente con ruolo revisor
-        User::create([
-            'name' => "Antony Delgado (Revisor)",
+        $this->createUserWithRoles([
+            'name' => 'Antony Delgado (Revisor)',
             'email' => 'revisor@aulab.it',
             'password' => Hash::make('password'),
-            'is_writer' => false,
+        ], [
             'is_revisor' => true,
-            'is_admin' => false,
         ]);
 
         // Crea un amministratore
-        User::create([
+        $this->createUserWithRoles([
             'name' => 'Steve Lorren (Admin)',
             'email' => 'admin@aulab.it',
             'password' => Hash::make('password'),
-            'is_writer' => false,
-            'is_revisor' => false,
+        ], [
             'is_admin' => true,
         ]);
 
         // Crea un super amministratore con tutti i ruoli
-        User::create([
-            'name' => "Mario Bianchi (Super admin)",
+        $this->createUserWithRoles([
+            'name' => 'Mario Bianchi (Super admin)',
             'email' => 'super.admin@aulab.it',
             'password' => Hash::make('password'),
+        ], [
             'is_writer' => true,
             'is_revisor' => true,
             'is_admin' => true,
         ]);
-        // Crea un super amministratore con tutti i ruoli
-        User::create([
-            'name' => "Kevin Ross (Attacker)",
+
+        // Crea un utente attacker senza ruoli
+        $this->createUserWithRoles([
+            'name' => 'Kevin Ross (Attacker)',
             'email' => 'kvrs@gmail.com',
             'password' => Hash::make('password'),
-            'is_writer' => false,
-            'is_revisor' => false,
-            'is_admin' => false,
         ]);
+    }
+
+    private function createUserWithRoles(array $userData, array $roles = []): User
+    {
+        $user = User::create($userData);
+
+        $user->forceFill([
+            'is_writer' => $roles['is_writer'] ?? false,
+            'is_revisor' => $roles['is_revisor'] ?? false,
+            'is_admin' => $roles['is_admin'] ?? false,
+        ])->save();
+
+        return $user;
     }
 }
