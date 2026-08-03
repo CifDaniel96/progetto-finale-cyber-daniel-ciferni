@@ -52,7 +52,7 @@ La pagina simula un sito esterno che prova a caricare la login page del progetto
 ```html
 <iframe src="http://cyber.blog:8000/login?bonus2_after_test=1"></iframe>
 ```
-
+Il parametro in query string è stato usato come cache-buster durante il retest, in modo da forzare il browser a richiedere nuovamente la pagina target dopo l'applicazione degli header.
 Per rendere il test visibile, l'iframe è stato inserito dentro un riquadro evidenziato, con un overlay che simula una pagina esterna controllata.
 
 ---
