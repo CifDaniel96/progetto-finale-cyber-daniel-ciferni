@@ -211,9 +211,19 @@ class ArticleController extends Controller implements HasMiddleware
         return view('articles.by-user', compact('user', 'articles'));
     }
 
-    public function articleSearch(Request $request){
-        $query = $request->input('query');
-        $articles = Article::search($query)->where('is_accepted', true)->orderBy('created_at', 'desc')->get();
-        return view('articles.search-index', compact('articles', 'query'));
-    }
+    public function articleSearch(Request $request)
+{
+    $validated = $request->validate([
+        'query' => 'nullable|string|max:255',
+    ]);
+
+    $query = $validated['query'] ?? '';
+
+    $articles = Article::search($query)
+        ->where('is_accepted', true)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('articles.search-index', compact('articles', 'query'));
+}
 }
